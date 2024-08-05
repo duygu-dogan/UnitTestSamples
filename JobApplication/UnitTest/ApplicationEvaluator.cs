@@ -18,8 +18,13 @@ namespace JobApplicationLibrary
 
         public ApplicationResult Evaluate(JobApplication form)
         {
+            if (form.Applicant is null)
+                throw new ArgumentNullException();
+
             if(form.Applicant.Age < minAge)
                 return ApplicationResult.AutoRejected;
+
+            _identityValidator.ValidationMode = form.Applicant.Age > 50 ? ValidationMode.Detailed : ValidationMode.Quick;
 
             if (_identityValidator.CountryDataProvider.CountryData.Country != "TURKEY")
                 return ApplicationResult.TransferredToCTO;

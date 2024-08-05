@@ -12,6 +12,8 @@ namespace JobApplicationLibrary.Services
 
         public ICountryDataProvider CountryDataProvider => throw new NotImplementedException();
 
+        public ValidationMode ValidationMode { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public bool IsValid(string identityNum)
         {
             return true;
