@@ -36,6 +36,10 @@ namespace JobApplicationLibrary.UnitTest
         {
             //Arrange
             var mockValidator = new Mock<IIdentityValidator>();
+
+            mockValidator.DefaultValue = DefaultValue.Mock;
+            mockValidator.Setup(i => i.CountryDataProvider.CountryData.Country).Returns("TURKEY");
+
             mockValidator.Setup(i => i.IsValid(It.IsAny<string>())).Returns(true);
 
             var evaluator = new ApplicationEvaluator(mockValidator.Object);
@@ -61,8 +65,14 @@ namespace JobApplicationLibrary.UnitTest
         public void Application_WithSkillOver75AndExperienceOver15_TransferredToAutoAccepted()
         {
             var mockValidator = new Mock<IIdentityValidator>();
+
+            mockValidator.DefaultValue = DefaultValue.Mock;
+            mockValidator.Setup(i => i.CountryDataProvider.CountryData.Country).Returns("TURKEY");
+
             mockValidator.Setup(i => i.IsValid(It.IsAny<string>())).Returns(true);
+
             var evaluator = new ApplicationEvaluator(mockValidator.Object);
+
             var application = new JobApplication()
             {
                 Applicant = new Applicant(),
@@ -78,9 +88,15 @@ namespace JobApplicationLibrary.UnitTest
         [Test]
         public void Application_WithInvalidIdentityNum_TransferredToHR()
         {
-            var mockValidator = new Mock<IIdentityValidator>();
+            var mockValidator = new Mock<IIdentityValidator>(MockBehavior.Loose);
+
+            mockValidator.DefaultValue = DefaultValue.Mock;
+            mockValidator.Setup(i => i.CountryDataProvider.CountryData.Country).Returns("TURKEY");
+
             mockValidator.Setup(i => i.IsValid(It.IsAny<string>())).Returns(false);
+
             var evaluator = new ApplicationEvaluator(mockValidator.Object);
+
             var application = new JobApplication()
             {
                 Applicant = new Applicant(),
@@ -89,6 +105,24 @@ namespace JobApplicationLibrary.UnitTest
             var appResult = evaluator.Evaluate(application);
 
             Assert.That(appResult, Is.EqualTo(ApplicationResult.TransferredToHr));
+        }
+
+        [Test]
+        public void Application_WithOfficeLocation_TransferredToCTO()
+        {
+            var mockValidator = new Mock<IIdentityValidator>();
+            mockValidator.Setup(i => i.CountryDataProvider.CountryData.Country).Returns("SPAIN");
+            
+            var evaluator = new ApplicationEvaluator(mockValidator.Object);
+
+            var application = new JobApplication()
+            {
+                Applicant = new Applicant()
+            };
+
+            var appResult = evaluator.Evaluate(application);
+
+            Assert.That(appResult, Is.EqualTo(ApplicationResult.TransferredToCTO));
         }
     }
 }
